@@ -1,0 +1,2 @@
+execute_script
+C:\ИТМО\Прога\Laba6Client\src\data\Script2.txt
