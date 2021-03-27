@@ -1,2 +1,2 @@
 execute_script
-C:\ИТМО\Прога\Laba6Client\src\data\Script2.txt
+C:\ИТМО\Прога\Lab6Client\src\data\Script2.txt

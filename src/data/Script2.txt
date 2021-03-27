@@ -1,5 +1,5 @@
 info
 show
-oexecute_script
-C:\ИТМО\Прога\Laba6Client\src\data\Script.txt
+execute_script
+C:\ИТМО\Прога\Lab6Client\src\data\Script.txt
 exit

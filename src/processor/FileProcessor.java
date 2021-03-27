@@ -48,14 +48,14 @@ public class FileProcessor extends Processor {
         }
         this.history.add(new File(path));
         //this.script = script;
-        dataFile = read().split("\n");
+        dataFile = read(path).split("\n");
         for (int i = 0; i < dataFile.length; i++) {
             dataFile[i] = dataFile[i].replace("\r", "");
         }
     }
 
 
-    private String read() throws IOException {
+    private String read(String path) throws IOException {
         StringBuilder dataFile = new StringBuilder();
 
         InputStreamReader reader = new InputStreamReader(new FileInputStream(path));
@@ -95,7 +95,7 @@ public class FileProcessor extends Processor {
             } catch (CommandNotFoundException e) {
                 System.out.println(e.getMessage());
             } catch (IOException e) {
-                //System.out.println("File not found");
+                System.out.println("File not found");
             }
         }
         return coms;

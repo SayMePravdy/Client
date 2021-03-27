@@ -7,9 +7,7 @@ import processor.ConsoleProcessor;
 import processor.FileProcessor;
 import processor.Processor;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
@@ -18,21 +16,27 @@ import java.util.List;
 public class Client {
     private final static String path = System.getenv().get("LAB5");
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         try (Socket socket = new Socket("localhost", 3345)) {
             ObjectOutputStream ous = new ObjectOutputStream(socket.getOutputStream());
-            DataInputStream dis = new DataInputStream(socket.getInputStream());
-
+            //DataInputStream dis = new DataInputStream(socket.getInputStream());
+            boolean stop = false;
             System.out.println("Client connected to server");
             if (path != null) {
                 FileProcessor fileProcessor = null;
                 try {
                     fileProcessor = new FileProcessor(path, null);
                     List<Data> tickets = fileProcessor.readDataFromCsv();
-                    for (Data d : tickets) {
-                        ous.writeObject(d);
-                        System.out.println(dis.readUTF());
+                    try {
+                        for (Data d : tickets) {
+                            ous.writeObject(d);
+                            System.out.println(getAnswer(socket));
+                        }
+                    } catch (IOException e) {
+                        System.out.println("Server is ill. Try to reconnect later");
+                        stop = true;
                     }
+
                 } catch (IOException e) {
                     System.out.println("Something wrong with file: " + path);
                 } catch (RecursiveScript e) {
@@ -42,18 +46,21 @@ public class Client {
                 System.out.println("File not found");
             }
 
-            ConsoleProcessor consoleProcessor = new ConsoleProcessor();
-            while (true) {
-                try {
-                    if (doCommands(consoleProcessor, ous, dis)) {
-                        break;
+            if (!stop) {
+                ConsoleProcessor consoleProcessor = new ConsoleProcessor();
+                while (true) {
+                    try {
+                        if (doCommands(consoleProcessor, ous, socket)) {
+                            break;
+                        }
+                        //String ans = dis.readUTF();
+                        //System.out.println(ans);
+                    } catch (CommandNotFoundException e) {
+                        System.out.println(e.getMessage());
                     }
-                    //String ans = dis.readUTF();
-                    //System.out.println(ans);
-                } catch (CommandNotFoundException e) {
-                    System.out.println(e.getMessage());
                 }
             }
+
         } catch (SocketException e) {
             System.out.println("The server is tired. Try to reconnect later");
         } catch (IOException e) {
@@ -61,11 +68,11 @@ public class Client {
         }
     }
 
-    public static boolean doCommands(Processor processor, ObjectOutputStream ous, DataInputStream dis) throws CommandNotFoundException {
+    public static boolean doCommands(Processor processor, ObjectOutputStream ous, Socket socket) throws CommandNotFoundException {
         try {
-            for (Data d :processor.readData()) {
+            for (Data d : processor.readData()) {
                 ous.writeObject(d);
-                String ans = dis.readUTF();
+                String ans = getAnswer(socket);
                 if (ans.equals("exit")) {
                     return true;
                 }
@@ -73,6 +80,7 @@ public class Client {
             }
         } catch (IOException e) {
             System.out.println("Server is closed");
+            return true;
         }
         return false;
     }
@@ -119,9 +127,19 @@ public class Client {
                 }
                 break;
             default:
-                throw new CommandNotFoundException("Command " + command + " doesn't exist");
+                throw new CommandNotFoundException("Command \"" + command + "\" doesn't exist");
         }
         //System.out.println(coms);
         return coms;
+    }
+
+    private static String getAnswer(Socket socket) throws IOException {
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        StringBuilder ans = new StringBuilder();
+        int c;
+        while ((c = in.read()) != -1) {
+            ans.append((char) c);
+        }
+        return ans.toString();
     }
 }
