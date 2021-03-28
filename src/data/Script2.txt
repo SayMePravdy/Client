@@ -2,4 +2,3 @@ info
 show
 execute_script
 C:\ИТМО\Прога\Lab6Client\src\data\Script.txt
-exit

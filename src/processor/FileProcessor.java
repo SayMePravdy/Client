@@ -1,6 +1,6 @@
 package processor;
 
-import client.Client;
+import client.CommandManager;
 import data.Data;
 import data.Coordinates;
 import data.Event;
@@ -91,7 +91,8 @@ public class FileProcessor extends Processor {
         List<Data> coms = new ArrayList<>();
         while (lineNum < dataFile.length) {
             try {
-                coms.addAll(Client.getCommands(dataFile[lineNum++], this));
+                CommandManager commandManager = new CommandManager(dataFile[lineNum++], this);
+                coms.addAll(commandManager.getCommands());
             } catch (CommandNotFoundException e) {
                 System.out.println(e.getMessage());
             } catch (IOException e) {

@@ -1,6 +1,7 @@
 package processor;
 
 import client.Client;
+import client.CommandManager;
 import data.Data;
 import data.Coordinates;
 import data.Event;
@@ -32,7 +33,8 @@ public class ConsoleProcessor extends Processor {
         String command = scanner.nextLine().trim();
         List<Data> com = new ArrayList<>();
         try {
-            com.addAll(Client.getCommands(command, this));
+            CommandManager commandManager = new CommandManager(command, this);
+            com.addAll(commandManager.getCommands());
         } catch (IOException e) {
             System.out.println("File not found");
         }

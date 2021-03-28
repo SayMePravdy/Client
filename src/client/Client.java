@@ -8,18 +8,25 @@ import processor.FileProcessor;
 import processor.Processor;
 
 import java.io.*;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
-import java.util.ArrayList;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.List;
 
 public class Client {
-    private final static String path = System.getenv().get("LAB5");
+    private final static String path = System.getenv().get("LAB6");
+    private static SocketChannel socket;
 
     public static void main(String[] args) {
-        try (Socket socket = new Socket("localhost", 3345)) {
-            ObjectOutputStream ous = new ObjectOutputStream(socket.getOutputStream());
-            //DataInputStream dis = new DataInputStream(socket.getInputStream());
+        try {
+            socket = SocketChannel.open();
+            socket.connect(new InetSocketAddress("localhost", 3345));
+            ByteBuffer buffer = ByteBuffer.allocate(65536);
+            buffer.put(serialize(new File(path)));
+            buffer.flip();
+            socket.write(buffer);
+            buffer.clear();
             boolean stop = false;
             System.out.println("Client connected to server");
             if (path != null) {
@@ -29,8 +36,14 @@ public class Client {
                     List<Data> tickets = fileProcessor.readDataFromCsv();
                     try {
                         for (Data d : tickets) {
-                            ous.writeObject(d);
-                            System.out.println(getAnswer(socket));
+                            //ByteBuffer buffer = ByteBuffer.allocate(65536);
+                            buffer.put(serialize(d));
+                            buffer.flip();
+                            socket.write(buffer);
+                            buffer.clear();
+                            socket.read(buffer);
+                            System.out.println(deserialize(buffer.array()));
+                            buffer.clear();
                         }
                     } catch (IOException e) {
                         System.out.println("Server is ill. Try to reconnect later");
@@ -50,17 +63,14 @@ public class Client {
                 ConsoleProcessor consoleProcessor = new ConsoleProcessor();
                 while (true) {
                     try {
-                        if (doCommands(consoleProcessor, ous, socket)) {
+                        if (sendCommands(consoleProcessor)) {
                             break;
                         }
-                        //String ans = dis.readUTF();
-                        //System.out.println(ans);
                     } catch (CommandNotFoundException e) {
                         System.out.println(e.getMessage());
                     }
                 }
             }
-
         } catch (SocketException e) {
             System.out.println("The server is tired. Try to reconnect later");
         } catch (IOException e) {
@@ -68,11 +78,17 @@ public class Client {
         }
     }
 
-    public static boolean doCommands(Processor processor, ObjectOutputStream ous, Socket socket) throws CommandNotFoundException {
+    public static boolean sendCommands(Processor processor) throws CommandNotFoundException {
         try {
             for (Data d : processor.readData()) {
-                ous.writeObject(d);
-                String ans = getAnswer(socket);
+                ByteBuffer buffer = ByteBuffer.allocate(65536);
+                buffer.put(serialize(d));
+                buffer.flip();
+                socket.write(buffer);
+                buffer.clear();
+                socket.read(buffer);
+                String ans = deserialize(buffer.array());
+                buffer.clear();
                 if (ans.equals("exit")) {
                     return true;
                 }
@@ -85,61 +101,26 @@ public class Client {
         return false;
     }
 
-    public static List<Data> getCommands(String command, Processor processor) throws CommandNotFoundException, IOException {
-        //Object[] args = new Object[2];
-        List<Data> coms = new ArrayList<>();
-        List<Object> args = new ArrayList<>();
-        switch (command) {
-            case "help":
-            case "info":
-            case "show":
-            case "clear":
-            case "sum_of_discount":
-            case "max_by_comment":
-            case "print_unique_price":
-            case "exit":
-                coms.add(new Data(command, args));
-                break;
 
-            case "add":
-            case "add_if_max":
-            case "add_if_min":
-            case "remove_greater":
-                args.add(processor.getTicket());
-                coms.add(new Data(command, args));
-                break;
 
-            case "update":
-                args.add(processor.getId());
-                args.add(processor.getTicket());
-                coms.add(new Data(command, args));
-                break;
-            case "remove_by_id":
-                args.add(processor.getId());
-                coms.add(new Data(command, args));
-                break;
-            case "execute_script":
-                try {
-                    FileProcessor fileProcessor = new FileProcessor(processor.getName(), processor.getHistory());
-                    coms.addAll(fileProcessor.readData());
-                } catch (RecursiveScript e) {
-                    System.out.println(e.getMessage());
-                }
-                break;
-            default:
-                throw new CommandNotFoundException("Command \"" + command + "\" doesn't exist");
+    private static <T> byte[] serialize(T data) {
+        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)){
+            objectOutputStream.writeObject(data);
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException e) {
+            System.out.println("Serialize problem");
         }
-        //System.out.println(coms);
-        return coms;
+        return null;
     }
 
-    private static String getAnswer(Socket socket) throws IOException {
-        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        StringBuilder ans = new StringBuilder();
-        int c;
-        while ((c = in.read()) != -1) {
-            ans.append((char) c);
+    private static String deserialize(byte [] buffer) {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+            return (String) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Deserialize error");
         }
-        return ans.toString();
+        return "POISON PILL";
     }
 }
