@@ -27,50 +27,21 @@ public class Client {
             buffer.flip();
             socket.write(buffer);
             buffer.clear();
-            boolean stop = false;
             System.out.println("Client connected to server");
-            if (path != null) {
-                FileProcessor fileProcessor = null;
-                try {
-                    fileProcessor = new FileProcessor(path, null);
-                    List<Data> tickets = fileProcessor.readDataFromCsv();
-                    try {
-                        for (Data d : tickets) {
-                            //ByteBuffer buffer = ByteBuffer.allocate(65536);
-                            buffer.put(serialize(d));
-                            buffer.flip();
-                            socket.write(buffer);
-                            buffer.clear();
-                            socket.read(buffer);
-                            System.out.println(deserialize(buffer.array()));
-                            buffer.clear();
-                        }
-                    } catch (IOException e) {
-                        System.out.println("Server is ill. Try to reconnect later");
-                        stop = true;
-                    }
+            socket.read(buffer);
+            System.out.println(deserialize(buffer.array()));
 
-                } catch (IOException e) {
-                    System.out.println("Something wrong with file: " + path);
-                } catch (RecursiveScript e) {
+            ConsoleProcessor consoleProcessor = new ConsoleProcessor();
+            while (true) {
+                try {
+                    if (sendCommands(consoleProcessor)) {
+                        break;
+                    }
+                } catch (CommandNotFoundException e) {
                     System.out.println(e.getMessage());
                 }
-            } else {
-                System.out.println("File not found");
             }
 
-            if (!stop) {
-                ConsoleProcessor consoleProcessor = new ConsoleProcessor();
-                while (true) {
-                    try {
-                        if (sendCommands(consoleProcessor)) {
-                            break;
-                        }
-                    } catch (CommandNotFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
         } catch (SocketException e) {
             System.out.println("The server is tired. Try to reconnect later");
         } catch (IOException e) {

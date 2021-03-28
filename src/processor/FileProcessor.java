@@ -69,23 +69,6 @@ public class FileProcessor extends Processor {
         return dataFile.toString();
     }
 
-    public List<Data> readDataFromCsv() {
-        List<Data> tickets = new ArrayList<>();
-        int num = 1;
-        for (String data : dataFile) {
-            Ticket ticket = getTicketFromCSV(data);
-            if (ticket != null) {
-                List<Object> arg = new ArrayList<>();
-                arg.add(ticket);
-                tickets.add(new Data("add", arg));
-            } else {
-                System.out.println("Incorrect data in line: " + num);
-            }
-            num++;
-        }
-        return tickets;
-    }
-
     @Override
     public List<Data> readData() {
         List<Data> coms = new ArrayList<>();
@@ -100,49 +83,6 @@ public class FileProcessor extends Processor {
             }
         }
         return coms;
-    }
-
-    private Ticket getTicketFromCSV(String data) {
-        String[] args = data.split(",");
-        try {
-            checkName(args[0]);
-            event = null;
-            ticketType = null;
-            ticketName = args[0];
-            x = Double.parseDouble(args[1]);
-            y = checkY(args[2]);
-            price = checkPrice(args[3]);
-            discount = checkDiscount(args[4]);
-            checkComment(args[5]);
-            comment = args[5];
-            if (args.length > 6) {
-                if (args.length == 7) {
-                    ticketType = checkTicketType(args[6]);
-                } else {
-                    if (args.length == 10) {
-                        ticketType = checkTicketType(args[6]);
-                        checkName(args[7]);
-                        eventName = args[7];
-                        minAge = Integer.parseInt(args[8]);
-                        ticketsCount = checkTicketsCount(args[9]);
-                        event = new Event(FIRST_EVENT_ID++, eventName, minAge, ticketsCount);
-                    } else {
-                        if (args.length == 9) {
-                            checkName(args[6]);
-                            eventName = args[6];
-                            minAge = Integer.parseInt(args[7]);
-                            ticketsCount = checkTicketsCount(args[8]);
-                            event = new Event(FIRST_EVENT_ID++, eventName, minAge, ticketsCount);
-                        } else {
-                            throw new WrongArgumentCount("");
-                        }
-                    }
-                }
-            }
-        } catch (InvalidArgument | NullTicketArgument | NumberFormatException | WrongArgumentCount | ArrayIndexOutOfBoundsException e) {
-            return null;
-        }
-        return new Ticket(FIRST_TICKET_ID++, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
     }
 
 
