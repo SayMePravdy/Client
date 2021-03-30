@@ -66,7 +66,7 @@ public class ConsoleProcessor extends Processor {
         event = getEvent(scanner);
 
 
-        return new Ticket(FIRST_TICKET_ID++, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+        return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
     }
 
     @Override
@@ -142,7 +142,7 @@ public class ConsoleProcessor extends Processor {
                 }
             }
 
-            event = new Event(FIRST_EVENT_ID++, eventName, minAge, ticketsCount);
+            event = new Event(0, eventName, minAge, ticketsCount);
         }
         return event;
     }

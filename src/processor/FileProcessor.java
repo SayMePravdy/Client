@@ -109,22 +109,22 @@ public class FileProcessor extends Processor {
             minAge = Integer.parseInt(dataFile[lineNum++]);
             skip++;
             ticketsCount = checkTicketsCount(dataFile[lineNum++]);
-            event = new Event(FIRST_EVENT_ID++, eventName, minAge, ticketsCount);
+            event = new Event(0, eventName, minAge, ticketsCount);
         } catch (NullTicketArgument | ArrayIndexOutOfBoundsException e) {
             //nullTicketArgument.printStackTrace();
             lineNum -= skip;
-            return new Ticket(FIRST_TICKET_ID++, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+            return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
         } catch (InvalidArgument e) {
             return null;
         } catch (NumberFormatException e) {
             if (mayNull) {
                 lineNum -= skip;
-                return new Ticket(FIRST_TICKET_ID++, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+                return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
             } else {
                 return null;
             }
         }
-        return new Ticket(FIRST_TICKET_ID++, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+        return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
     }
 
     @Override

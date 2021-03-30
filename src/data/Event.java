@@ -28,4 +28,8 @@ public class Event implements Serializable {
     public String toCsv() {
         return name + "," + minAge + "," + ticketsCount;
     }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 }

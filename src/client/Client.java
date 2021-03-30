@@ -17,41 +17,67 @@ import java.util.List;
 public class Client {
     private final static String path = System.getenv().get("LAB6");
     private static SocketChannel socket;
+    private static boolean firstReconnect = true;
+    private static Data lastData = null;
 
     public static void main(String[] args) {
         try {
             socket = SocketChannel.open();
-            socket.connect(new InetSocketAddress("localhost", 3345));
+            socket.connect(new InetSocketAddress("localhost", 13345));
             ByteBuffer buffer = ByteBuffer.allocate(65536);
-            buffer.put(serialize(new File(path)));
+            if (path != null) {
+                buffer.put(serialize(new File(path)));
+            } else {
+                buffer.put(serialize(new File("SavedFile")));
+            }
             buffer.flip();
             socket.write(buffer);
             buffer.clear();
             System.out.println("Client connected to server");
             socket.read(buffer);
             System.out.println(deserialize(buffer.array()));
-
-            ConsoleProcessor consoleProcessor = new ConsoleProcessor();
-            while (true) {
-                try {
-                    if (sendCommands(consoleProcessor)) {
-                        break;
+            String ans = "";
+            if (!firstReconnect) {
+                buffer.clear();
+                buffer.put(serialize(lastData));
+                buffer.flip();
+                socket.write(buffer);
+                buffer.clear();
+                socket.read(buffer);
+                ans = deserialize(buffer.array());
+                buffer.clear();
+                System.out.println(ans);
+            }
+            if (!ans.equals("exit")) {
+                ConsoleProcessor consoleProcessor = new ConsoleProcessor();
+                while (true) {
+                    try {
+                        if (sendCommands(consoleProcessor)) {
+                            break;
+                        }
+                    } catch (CommandNotFoundException e) {
+                        System.out.println(e.getMessage());
                     }
-                } catch (CommandNotFoundException e) {
-                    System.out.println(e.getMessage());
                 }
             }
 
         } catch (SocketException e) {
-            System.out.println("The server is tired. Try to reconnect later");
+            if (firstReconnect) {
+                System.out.println("The server is tired. Try to reconnect later");
+                firstReconnect = false;
+            }
+            main(args);
         } catch (IOException e) {
             e.printStackTrace();
+            main(args);
         }
     }
 
     public static boolean sendCommands(Processor processor) throws CommandNotFoundException {
+        Data data = null;
         try {
             for (Data d : processor.readData()) {
+                data = d;
                 ByteBuffer buffer = ByteBuffer.allocate(65536);
                 buffer.put(serialize(d));
                 buffer.flip();
@@ -65,8 +91,10 @@ public class Client {
                 }
                 System.out.println(ans);
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassCastException e) {
             System.out.println("Server is closed");
+            lastData = data;
+            main(null);
             return true;
         }
         return false;
@@ -85,7 +113,7 @@ public class Client {
         return null;
     }
 
-    private static String deserialize(byte [] buffer) {
+    private static String deserialize(byte [] buffer) throws ClassCastException{
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
             return (String) objectInputStream.readObject();
