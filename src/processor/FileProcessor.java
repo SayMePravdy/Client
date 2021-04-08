@@ -85,6 +85,26 @@ public class FileProcessor extends Processor {
         return coms;
     }
 
+    @Override
+    public String getLogin() {
+        try {
+            return dataFile[lineNum++];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Error");
+        }
+        return "";
+    }
+
+    @Override
+    public String getPassword() {
+        try {
+            return dataFile[lineNum++];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Error");
+        }
+        return "";
+    }
+
 
     @Override
     public Ticket getTicket() {

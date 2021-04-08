@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Coordinates implements Serializable {
     private double x;
     private float y; //Максимальное значение поля: 266
+    private static final long serialVersionUID = 1L;
 
     public Coordinates(double x, float y) {
         this.x = x;

@@ -36,6 +36,8 @@ public abstract class Processor {
     public abstract int getId();
     public abstract String getName();
     public abstract List<Data> readData() throws CommandNotFoundException;
+    public abstract String getLogin();
+    public abstract String getPassword();
 
     public boolean isExit() {
         return exit;

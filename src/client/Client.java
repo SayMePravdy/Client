@@ -25,18 +25,8 @@ public class Client {
             socket = SocketChannel.open();
             socket.connect(new InetSocketAddress("localhost", 13345));
             ByteBuffer buffer = ByteBuffer.allocate(65536);
-            if (path != null) {
-                buffer.put(serialize(new File(path)));
-            } else {
-                buffer.put(serialize(new File("SavedFile")));
-            }
-            buffer.flip();
-            socket.write(buffer);
-            buffer.clear();
             System.out.println("Client connected to server");
-            socket.read(buffer);
-            System.out.println(deserialize(buffer.array()));
-            String ans = "";
+            String ans = "notFirstReconnect";
             if (!firstReconnect) {
                 buffer.clear();
                 buffer.put(serialize(lastData));
@@ -78,6 +68,9 @@ public class Client {
         try {
             for (Data d : processor.readData()) {
                 data = d;
+                if (d.getCommandName().equals("exit")) {
+                    return true;
+                }
                 ByteBuffer buffer = ByteBuffer.allocate(65536);
                 buffer.put(serialize(d));
                 buffer.flip();
@@ -86,9 +79,6 @@ public class Client {
                 socket.read(buffer);
                 String ans = deserialize(buffer.array());
                 buffer.clear();
-                if (ans.equals("exit")) {
-                    return true;
-                }
                 System.out.println(ans);
             }
         } catch (IOException | ClassCastException e) {

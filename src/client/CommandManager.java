@@ -31,7 +31,7 @@ public class CommandManager {
             case "max_by_comment":
             case "print_unique_price":
             case "exit":
-                coms.add(new Data(command, args));
+            case "register":
                 break;
 
             case "add":
@@ -39,17 +39,14 @@ public class CommandManager {
             case "add_if_min":
             case "remove_greater":
                 args.add(processor.getTicket());
-                coms.add(new Data(command, args));
                 break;
 
             case "update":
                 args.add(processor.getId());
                 args.add(processor.getTicket());
-                coms.add(new Data(command, args));
                 break;
             case "remove_by_id":
                 args.add(processor.getId());
-                coms.add(new Data(command, args));
                 break;
             case "execute_script":
                 try {
@@ -62,6 +59,15 @@ public class CommandManager {
             default:
                 throw new CommandNotFoundException("Command \"" + command + "\" doesn't exist");
         }
+        String login = processor.getLogin();
+        String password = processor.getPassword();
+
+        if (command.equals("register")) {
+            args.add(login);
+            args.add(password);
+        }
+
+        coms.add(new Data(command, args, login, password));
         return coms;
     }
 }

@@ -39,11 +39,25 @@ public class ConsoleProcessor extends Processor {
             System.out.println("File not found");
         }
         return com;
-//        while (!Execute.doCommand(command, treeSet, this)) {
-//
-//            System.out.println("Enter a command");
-//            command = scanner.nextLine().trim();
-//        }
+    }
+
+    @Override
+    public String getLogin() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter login");
+        String login = scanner.nextLine();
+        while (login.isEmpty()) {
+            System.out.println("Login can't be empty");
+            login = scanner.nextLine();
+        }
+        return login;
+    }
+
+    @Override
+    public String getPassword() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter password");
+        return scanner.nextLine();
     }
 
     @Override
