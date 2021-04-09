@@ -56,7 +56,7 @@ public class Client {
                 System.out.println("The server is tired. Try to reconnect later");
                 firstReconnect = false;
             }
-            main(args);
+            if (lastData != null) main(args);
         } catch (IOException e) {
             e.printStackTrace();
             main(args);

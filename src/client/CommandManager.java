@@ -59,15 +59,16 @@ public class CommandManager {
             default:
                 throw new CommandNotFoundException("Command \"" + command + "\" doesn't exist");
         }
-        String login = processor.getLogin();
-        String password = processor.getPassword();
-
-        if (command.equals("register")) {
-            args.add(login);
-            args.add(password);
+        if (!command.equals("execute_script")) {
+            String login = processor.getLogin();
+            String password = processor.getPassword();
+            if (command.equals("register")) {
+                args.add(login);
+                args.add(password);
+            }
+            coms.add(new Data(command, args, login, password));
         }
 
-        coms.add(new Data(command, args, login, password));
         return coms;
     }
 }

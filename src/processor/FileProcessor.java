@@ -119,7 +119,8 @@ public class FileProcessor extends Processor {
             y = checkY(dataFile[lineNum++]);
             price = checkPrice(dataFile[lineNum++]);
             discount = checkDiscount(dataFile[lineNum++]);
-            checkComment(dataFile[lineNum++]);
+            checkComment(dataFile[lineNum]);
+            comment = dataFile[lineNum++];
             skip++;
             mayNull = true;
             ticketType = checkTicketType(dataFile[lineNum++]);
