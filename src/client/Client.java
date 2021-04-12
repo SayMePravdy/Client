@@ -12,10 +12,8 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.List;
 
 public class Client {
-    private final static String path = System.getenv().get("LAB6");
     private static SocketChannel socket;
     private static boolean firstReconnect = true;
     private static Data lastData = null;
@@ -25,7 +23,9 @@ public class Client {
             socket = SocketChannel.open();
             socket.connect(new InetSocketAddress("localhost", 13345));
             ByteBuffer buffer = ByteBuffer.allocate(65536);
-            System.out.println("Client connected to server");
+            if (firstReconnect) {
+                System.out.println("Client connected to server");
+            }
             String ans = "notFirstReconnect";
             if (!firstReconnect) {
                 buffer.clear();
@@ -49,6 +49,7 @@ public class Client {
                         System.out.println(e.getMessage());
                     }
                 }
+
             }
 
         } catch (SocketException e) {
@@ -80,9 +81,15 @@ public class Client {
                 String ans = deserialize(buffer.array());
                 buffer.clear();
                 System.out.println(ans);
+                if (ans.contains("exit")) {
+                    socket = SocketChannel.open();
+                    socket.connect(new InetSocketAddress("localhost", 13345));
+                    return true;
+                }
             }
         } catch (IOException | ClassCastException e) {
-            System.out.println("Server is closed");
+            System.out.println("Server is closed. Try to reconnect...");
+            firstReconnect = false;
             lastData = data;
             main(null);
             return true;
@@ -91,10 +98,9 @@ public class Client {
     }
 
 
-
     private static <T> byte[] serialize(T data) {
-        try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)){
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
             objectOutputStream.writeObject(data);
             return byteArrayOutputStream.toByteArray();
         } catch (IOException e) {
@@ -103,9 +109,9 @@ public class Client {
         return null;
     }
 
-    private static String deserialize(byte [] buffer) throws ClassCastException{
+    private static String deserialize(byte[] buffer) throws ClassCastException {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer);
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
+             ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
             return (String) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.out.println("Deserialize error");
