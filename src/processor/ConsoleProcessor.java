@@ -29,7 +29,11 @@ public class ConsoleProcessor extends Processor {
     @Override
     public List<Data> readData() throws CommandNotFoundException {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter a command");
+        if (Client.login != null) {
+            System.out.println("Enter a command");
+        } else{
+            System.out.println("Please authorization or register");
+        }
         String command = scanner.nextLine().trim();
         List<Data> com = new ArrayList<>();
         try {

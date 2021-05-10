@@ -12,20 +12,30 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Scanner;
 
 public class Client {
     private static SocketChannel socket;
     private static boolean firstReconnect = true;
     private static Data lastData = null;
+    private static boolean authorization = false;
+    public static String login;
+    private static String password;
+
+    public static String getLogin() {
+        return login;
+    }
+
+    public static String getPassword() {
+        return password;
+    }
 
     public static void main(String[] args) {
         try {
             socket = SocketChannel.open();
             socket.connect(new InetSocketAddress("localhost", 13345));
+            ConsoleProcessor consoleProcessor = new ConsoleProcessor();
             ByteBuffer buffer = ByteBuffer.allocate(65536);
-            if (firstReconnect) {
-                System.out.println("Client connected to server");
-            }
             String ans = "notFirstReconnect";
             if (!firstReconnect) {
                 buffer.clear();
@@ -39,12 +49,13 @@ public class Client {
                 System.out.println(ans);
             }
             if (!ans.equals("exit")) {
-                ConsoleProcessor consoleProcessor = new ConsoleProcessor();
                 while (true) {
                     try {
                         if (sendCommands(consoleProcessor)) {
                             break;
                         }
+                        socket = SocketChannel.open();
+                        socket.connect(new InetSocketAddress("localhost", 13345));
                     } catch (CommandNotFoundException e) {
                         System.out.println(e.getMessage());
                     }
@@ -64,27 +75,66 @@ public class Client {
         }
     }
 
+//    public static void authorization(Processor processor) throws IOException {
+//        Scanner scanner = new Scanner(System.in);
+//        String data;
+//        while (true) {
+//            System.out.println("Do you want register or authorization");
+//            data = scanner.nextLine();
+//            if (data.equals("register") || data.equals("authorization")) {
+//                break;
+//            }
+//            System.out.println("Incorrect data");
+//        }
+//        sendCommands(processor)
+//        ByteBuffer buffer = ByteBuffer.allocate(65536);
+//        buffer.put(serialize(processor.getLogin()));
+//        buffer.put(serialize(processor.getPassword()));
+//        buffer.flip();
+//        socket.write(buffer);
+//        buffer.clear();
+//        socket.read(buffer);
+//        String ans = deserialize(buffer.array());
+//        if (ans != "Doesn't find this user") {
+//            authorization = true;
+//            System.out.println("Client connected to server");
+//        } else {
+//            System.out.println(ans);
+//        }
+//    }
+
     public static boolean sendCommands(Processor processor) throws CommandNotFoundException {
         Data data = null;
         try {
             for (Data d : processor.readData()) {
                 data = d;
-                if (d.getCommandName().equals("exit")) {
-                    return true;
-                }
-                ByteBuffer buffer = ByteBuffer.allocate(65536);
-                buffer.put(serialize(d));
-                buffer.flip();
-                socket.write(buffer);
-                buffer.clear();
-                socket.read(buffer);
-                String ans = deserialize(buffer.array());
-                buffer.clear();
-                System.out.println(ans);
-                if (ans.contains("exit")) {
-                    socket = SocketChannel.open();
-                    socket.connect(new InetSocketAddress("localhost", 13345));
-                    return true;
+                if (authorization || data.getCommandName().equals("authorization") || data.getCommandName().equals("register")) {
+                    if (d.getCommandName().equals("exit")) {
+                        return true;
+                    }
+                    ByteBuffer buffer = ByteBuffer.allocate(65536);
+                    buffer.put(serialize(d));
+                    buffer.flip();
+                    socket.write(buffer);
+                    buffer.clear();
+                    socket.read(buffer);
+                    String ans = deserialize(buffer.array());
+                    if (!(ans.equals("Your data is too long") || ans.equals("User with this login already exists") || ans.equals("Doesn't found this user"))) {
+                        authorization = true;
+                        login = data.getLogin();
+                        password = data.getPassword();
+                    }
+                    buffer.clear();
+                    System.out.println(ans);
+
+                    if (ans.contains("exit")) {
+                        socket = SocketChannel.open();
+                        socket.connect(new InetSocketAddress("localhost", 13345));
+                        return true;
+                    }
+                }else {
+                    System.out.println("Please authorization or register user");
+                    return false;
                 }
             }
         } catch (IOException | ClassCastException e) {
