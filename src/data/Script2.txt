@@ -1,9 +1,5 @@
 info
-admin
-admin
 show
-admin
-admin
 add
 11
 11
@@ -15,5 +11,3 @@ VIP
 4
 4
 4
-admin
-admin

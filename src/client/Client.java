@@ -1,8 +1,23 @@
 package client;
 
+import client.gui.controllers.StartWindowController;
 import data.Data;
 import exceptions.CommandNotFoundException;
 import exceptions.RecursiveScript;
+import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.stage.Stage;
 import processor.ConsoleProcessor;
 import processor.FileProcessor;
 import processor.Processor;
@@ -14,13 +29,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 
-public class Client {
+public class Client extends Application {
     private static SocketChannel socket;
-    private static boolean firstReconnect = true;
-    private static Data lastData = null;
     private static boolean authorization = false;
-    public static String login;
-    private static String password;
+    private static String login;
+    private static String password = "";
 
     public static String getLogin() {
         return login;
@@ -32,79 +45,109 @@ public class Client {
 
     public static void main(String[] args) {
         try {
-            socket = SocketChannel.open();
-            socket.connect(new InetSocketAddress("localhost", 13345));
-            ConsoleProcessor consoleProcessor = new ConsoleProcessor();
-            ByteBuffer buffer = ByteBuffer.allocate(65536);
-            String ans = "notFirstReconnect";
-            if (!firstReconnect) {
-                buffer.clear();
-                buffer.put(serialize(lastData));
-                buffer.flip();
-                socket.write(buffer);
-                buffer.clear();
-                socket.read(buffer);
-                ans = deserialize(buffer.array());
-                buffer.clear();
-                System.out.println(ans);
-            }
-            if (!ans.equals("exit")) {
-                while (true) {
-                    try {
-                        if (sendCommands(consoleProcessor)) {
-                            break;
-                        }
-                        socket = SocketChannel.open();
-                        socket.connect(new InetSocketAddress("localhost", 13345));
-                    } catch (CommandNotFoundException e) {
-                        System.out.println(e.getMessage());
-                    }
-                }
-
-            }
-
+            //socket = SocketChannel.open();
+            //socket.connect(new InetSocketAddress("localhost", 13345));
+            launch(args);
+            start();
         } catch (SocketException e) {
-            if (firstReconnect) {
-                System.out.println("The server is tired. Try to reconnect later");
-                firstReconnect = false;
-            }
-            if (lastData != null) main(args);
+            System.out.println("The server is tired. Try to reconnect later");
         } catch (IOException e) {
-            e.printStackTrace();
-            main(args);
         }
     }
 
-//    public static void authorization(Processor processor) throws IOException {
-//        Scanner scanner = new Scanner(System.in);
-//        String data;
-//        while (true) {
-//            System.out.println("Do you want register or authorization");
-//            data = scanner.nextLine();
-//            if (data.equals("register") || data.equals("authorization")) {
-//                break;
-//            }
-//            System.out.println("Incorrect data");
-//        }
-//        sendCommands(processor)
-//        ByteBuffer buffer = ByteBuffer.allocate(65536);
-//        buffer.put(serialize(processor.getLogin()));
-//        buffer.put(serialize(processor.getPassword()));
-//        buffer.flip();
-//        socket.write(buffer);
-//        buffer.clear();
-//        socket.read(buffer);
-//        String ans = deserialize(buffer.array());
-//        if (ans != "Doesn't find this user") {
-//            authorization = true;
-//            System.out.println("Client connected to server");
-//        } else {
-//            System.out.println(ans);
-//        }
-//    }
+    @Override
+    public void start(Stage stage) throws Exception {
+        StartWindowController.setStage(stage);
+        stage.setMinHeight(435);
+        stage.setMinWidth(100);
+
+        FXMLLoader root = new FXMLLoader();
+        root.setLocation(getClass().getResource("/client/gui/scenes/start.fxml"));
+        Parent xml = root.load();
+        Scene scene = new Scene(xml);
+
+
+        stage.setScene(scene);
+
+        //stage.setTitle("Hello JavaFX");
+        stage.setWidth(700);
+        stage.setHeight(500);
+
+        stage.show();
+    }
+
+    public static void setLogin(String login) {
+        Client.login = login;
+    }
+
+    public static void setPassword(String password) {
+        Client.password = password;
+    }
+
+    public static void showWindow(double height, double width, String msg, Color color) {
+        Label label = new Label(msg);
+        label.setTextFill(color);
+        label.setFont(new Font(20));
+        BorderPane pane = new BorderPane(label);
+        Scene scene = new Scene(pane);
+        Stage stage = new Stage();
+        stage.setScene(scene);
+        stage.setMinWidth(width);
+        stage.setMinHeight(height);
+        stage.setHeight(height);
+        stage.setWidth(width);
+        stage.show();
+    }
+
+
+    public static Stage changeWindow(String window, Stage startStage, double minHeight, double minWidth) {
+        try {
+            FXMLLoader root = new FXMLLoader();
+            root.setLocation(Client.class.getResource(window));
+            Parent xml = root.load();
+            Scene scene = new Scene(xml);
+            Stage stage = new Stage();
+            stage.setScene(scene);
+            stage.setMinHeight(minHeight);
+            stage.setMinWidth(minWidth);
+            startStage.close();
+            stage.show();
+            return stage;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void start() throws IOException {
+        ConsoleProcessor consoleProcessor = new ConsoleProcessor();
+        while (true) {
+            try {
+                if (sendCommands(consoleProcessor)) {
+                    break;
+                }
+                socket = SocketChannel.open();
+                socket.connect(new InetSocketAddress("localhost", 13345));
+            } catch (CommandNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static String sendCommand(Data data) throws IOException {
+        socket = SocketChannel.open();
+        socket.connect(new InetSocketAddress("localhost", 13345));
+        ByteBuffer buffer = ByteBuffer.allocate(65536);
+        buffer.put(serialize(data));
+        buffer.flip();
+        socket.write(buffer);
+        buffer.clear();
+        socket.read(buffer);
+        return deserialize(buffer.array());
+    }
 
     public static boolean sendCommands(Processor processor) throws CommandNotFoundException {
-        Data data = null;
+        Data data;
         try {
             for (Data d : processor.readData()) {
                 data = d;
@@ -139,9 +182,6 @@ public class Client {
             }
         } catch (IOException | ClassCastException e) {
             System.out.println("Server is closed. Try to reconnect...");
-            firstReconnect = false;
-            lastData = data;
-            main(null);
             return true;
         }
         return false;
@@ -168,4 +208,5 @@ public class Client {
         }
         return "POISON PILL";
     }
+
 }

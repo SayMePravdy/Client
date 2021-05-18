@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="100.0" minWidth="100.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.controllers.GetTicketController">
+   <left>
+      <VBox alignment="CENTER" minHeight="100.0" minWidth="100.0" prefHeight="311.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets left="50.0" />
+         </BorderPane.margin>
+         <children>
+            <Label alignment="CENTER" contentDisplay="CENTER" text="Имя" />
+            <TextField fx:id="name" VBox.vgrow="ALWAYS" />
+            <Label text="Координаты" />
+            <HBox alignment="CENTER" prefHeight="32.0" prefWidth="200.0" spacing="15.0">
+               <children>
+                  <TextField fx:id="x" />
+                  <TextField fx:id="y" />
+               </children>
+            </HBox>
+            <Label text="Цена" />
+            <TextField fx:id="price"  />
+            <Label text="Скидка" />
+            <TextField fx:id="discount"  />
+            <Label text="Комментраий" />
+            <TextField fx:id="comment"  />
+         </children>
+      </VBox>
+   </left>
+   <right>
+      <VBox alignment="CENTER" prefHeight="311.0" prefWidth="200.0" spacing="3.5" BorderPane.alignment="CENTER">
+         <BorderPane.margin>
+            <Insets right="50.0" />
+         </BorderPane.margin>
+         <children>
+            <Label text="Тип Билета" />
+            <ChoiceBox fx:id="ticketType" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="27.0" prefWidth="139.0" />
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+               <children>
+                  <Label text="Событие:">
+                     <font>
+                        <Font name="System Bold Italic" size="20.0" />
+                     </font>
+                  </Label>
+                  <CheckBox fx:id="hasEvent" mnemonicParsing="false" />
+               </children>
+            </HBox>
+            <Label text="Имя">
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </Label>
+            <TextField fx:id="eventName" >
+               <VBox.margin>
+                  <Insets />
+               </VBox.margin>
+            </TextField>
+            <Label text="Минимальный возраст" />
+            <TextField fx:id="minAge" />
+            <Label text="Количество билетов" />
+            <TextField fx:id="ticketsCount" />
+         </children>
+      </VBox>
+   </right>
+   <top>
+      <Label text="Билет" BorderPane.alignment="CENTER">
+         <font>
+            <Font name="System Bold" size="29.0" />
+         </font>
+         <BorderPane.margin>
+            <Insets top="15.0" />
+         </BorderPane.margin>
+      </Label>
+   </top>
+   <bottom>
+      <HBox alignment="BOTTOM_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="enter" alignment="CENTER" mnemonicParsing="false" onAction="#enter" text="Ввести" />
+            <Button fx:id="back" mnemonicParsing="false" onAction="#back" text="Назад" />
+         </children>
+      </HBox>
+   </bottom>
+</BorderPane>

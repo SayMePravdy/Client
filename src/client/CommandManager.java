@@ -3,6 +3,7 @@ package client;
 import data.Data;
 import exceptions.CommandNotFoundException;
 import exceptions.RecursiveScript;
+import javafx.scene.paint.Color;
 import processor.FileProcessor;
 import processor.Processor;
 
@@ -63,7 +64,8 @@ public class CommandManager {
                     FileProcessor fileProcessor = new FileProcessor(processor.getName(), processor.getHistory());
                     coms.addAll(fileProcessor.readData());
                 } catch (RecursiveScript e) {
-                    System.out.println(e.getMessage());
+                    //System.out.println(e.getMessage());
+                    Client.showWindow(150, 300, "Error! Recursion in script!", Color.RED);
                 }
                 break;
             default:

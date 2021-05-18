@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="901.0" spacing="50.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.controllers.TableController">
+   <children>
+      <Label text="Таблица">
+         <font>
+            <Font name="System Bold Italic" size="32.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER" prefHeight="144.0" prefWidth="901.0">
+         <children>
+            <TableView fx:id="table" onSort="#sort" prefHeight="100.0" prefWidth="914.0">
+              <columns>
+                <TableColumn prefWidth="38.0" text="id" />
+                <TableColumn prefWidth="99.0" text="Ticket Name " />
+                  <TableColumn prefWidth="21.0" text="X" />
+                  <TableColumn prefWidth="25.0" text="Y" />
+                  <TableColumn prefWidth="110.0" text="Creation Date" />
+                  <TableColumn prefWidth="55.0" text="Price" />
+                  <TableColumn prefWidth="70.0" text="Discount" />
+                  <TableColumn prefWidth="78.0" text="Comment" />
+                  <TableColumn prefWidth="41.0" text="Type" />
+                  <TableColumn prefWidth="65.0" text="Event id" />
+                  <TableColumn prefWidth="94.0" text="Event Name" />
+                  <TableColumn minWidth="0.0" prefWidth="101.0" text="Tickets count" />
+                  <TableColumn minWidth="0.0" prefWidth="102.0" text="Minimal Age" />
+              </columns>
+            </TableView>
+         </children>
+      </HBox>
+      <Button fx:id="backButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#back" text="Назад" />
+   </children>
+</VBox>
