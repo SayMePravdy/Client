@@ -1,5 +1,7 @@
 package data;
 
+import client.Client;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -9,16 +11,63 @@ public class Ticket implements Comparable<Ticket>, Serializable {
 
     private int id; //Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
-    private Coordinates coordinates; //Поле не может быть null
+
     private ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     private float price; //Значение поля должно быть больше 0
     private long discount; //Значение поля должно быть больше 0, Максимальное значение поля: 100
     private String comment; //Строка не может быть пустой, Поле не может быть null
 
     private TicketType type; //Поле может быть null
+    private String user;
+    private Integer eventId; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+
+    public Integer getEventId() {
+        if (event != null) {
+            return event.getId();
+        }
+        return eventId;
+    }
+
+    public String getEventName() {
+        if (event != null) {
+            return event.getName();
+        }
+        return eventName;
+    }
+
+    public Integer getMinAge() {
+        if (event != null) {
+            return event.getMinAge();
+        }
+        return minAge;
+    }
+
+    public Integer getTicketsCount() {
+        if (event != null) {
+            return event.getTicketsCount();
+        }
+        return ticketsCount;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Ticket ticket = (Ticket) o;
+        return id == ticket.id && Float.compare(ticket.price, price) == 0 && discount == ticket.discount && name.equals(ticket.name) && creationDate.equals(ticket.creationDate) && comment.equals(ticket.comment) && type == ticket.type && coordinates.equals(ticket.coordinates);
+    }
+
+    private String eventName; //Поле не может быть null, Строка не может быть пустой
+    private Integer minAge;
+    private Integer ticketsCount;
+    private Coordinates coordinates; //Поле не может быть null
     private Event event; //Поле может быть null
 
-    public Ticket(int id, String name, Coordinates coordinates, ZonedDateTime creationDate, float price, long discount, String comment, TicketType type, Event event) {
+    public String getUser() {
+        return user;
+    }
+
+    public Ticket(int id, String name, Coordinates coordinates, ZonedDateTime creationDate, float price, long discount, String comment, TicketType type, Event event, String user) {
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
@@ -28,6 +77,21 @@ public class Ticket implements Comparable<Ticket>, Serializable {
         this.comment = comment;
         this.type = type;
         this.event = event;
+        this.user = user;
+//        this.x = coordinates.getX();
+//        this.y = coordinates.getY();
+//        this.eventName = event.getName();
+//        this.eventId = event.getId();
+//        this.ticketsCount = event.getTicketsCount();
+//        this.minAge = event.getMinAge();
+    }
+
+    public double getX() {
+        return coordinates.getX();
+    }
+
+    public float getY() {
+        return coordinates.getY();
     }
 
     public int getId() {

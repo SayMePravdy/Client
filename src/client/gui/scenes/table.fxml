@@ -5,33 +5,46 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-
-<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="901.0" spacing="50.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.controllers.TableController">
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="502.0" prefWidth="924.0" spacing="50.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.gui.controllers.TableController">
    <children>
       <Label text="Таблица">
          <font>
             <Font name="System Bold Italic" size="32.0" />
          </font>
       </Label>
-      <HBox alignment="CENTER" prefHeight="144.0" prefWidth="901.0">
+      <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="241.0" prefWidth="924.0">
          <children>
-            <TableView fx:id="table" onSort="#sort" prefHeight="100.0" prefWidth="914.0">
+            <TableView fx:id="table" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="241.0" prefWidth="942.0">
               <columns>
-                <TableColumn prefWidth="38.0" text="id" />
-                <TableColumn prefWidth="99.0" text="Ticket Name " />
-                  <TableColumn prefWidth="21.0" text="X" />
-                  <TableColumn prefWidth="25.0" text="Y" />
-                  <TableColumn prefWidth="110.0" text="Creation Date" />
-                  <TableColumn prefWidth="55.0" text="Price" />
-                  <TableColumn prefWidth="70.0" text="Discount" />
-                  <TableColumn prefWidth="78.0" text="Comment" />
-                  <TableColumn prefWidth="41.0" text="Type" />
-                  <TableColumn prefWidth="65.0" text="Event id" />
-                  <TableColumn prefWidth="94.0" text="Event Name" />
-                  <TableColumn minWidth="0.0" prefWidth="101.0" text="Tickets count" />
-                  <TableColumn minWidth="0.0" prefWidth="102.0" text="Minimal Age" />
+                <TableColumn fx:id="idColumn" prefWidth="38.0" text="id" />
+                <TableColumn fx:id="ticketNameColumn" prefWidth="65.0" text="Name" />
+                  <TableColumn prefWidth="36.0" text="X" fx:id="xColumn" />
+                  <TableColumn fx:id="yColumn" prefWidth="33.0" text="Y" />
+                  <TableColumn fx:id="dateColumn" prefWidth="121.0" text="CreationDate" />
+                  <TableColumn fx:id="priceColumn" prefWidth="55.0" text="Price" />
+                  <TableColumn fx:id="discountColumn" prefWidth="70.0" text="Discount" />
+                  <TableColumn fx:id="commentColumn" prefWidth="78.0" text="Comment" />
+                  <TableColumn fx:id="typeColumn" prefWidth="79.0" text="Type" />
+                  <TableColumn fx:id="eventIdColumn" prefWidth="65.0" text="eventId" />
+                  <TableColumn fx:id="eventNameColumn" prefWidth="92.0" text="eventName" />
+                  <TableColumn fx:id="ticketsCountColumn" minWidth="0.0" prefWidth="113.0" text="ticketsCount" />
+                  <TableColumn fx:id="minimalAgeColumn" minWidth="0.0" prefWidth="66.0" text="MinAge" />
               </columns>
             </TableView>
+         </children>
+      </HBox>
+      <HBox alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+         <children>
+            <ChoiceBox fx:id="field" prefWidth="150.0" />
+            <TextField fx:id="word" prefHeight="31.0" prefWidth="152.0" />
+            <Button fx:id="sortButton" mnemonicParsing="false" onAction="#sort" text="Сортировать" />
+            <Button fx:id="filterButton" layoutX="347.0" layoutY="10.0" mnemonicParsing="false" onAction="#filter" text="Фильтровать" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
+         <children>
+            <Button fx:id="updateButton" mnemonicParsing="false" onAction="#update" text="Обновить выбранную ячейку" />
+            <Button fx:id="showButton" mnemonicParsing="false" onAction="#loadTickets" text="Показать все билеты" />
          </children>
       </HBox>
       <Button fx:id="backButton" alignment="TOP_LEFT" mnemonicParsing="false" onAction="#back" text="Назад" />

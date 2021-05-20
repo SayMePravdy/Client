@@ -84,7 +84,7 @@ public class ConsoleProcessor extends Processor {
         event = getEvent(scanner);
 
 
-        return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+        return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event, Client.getLogin());
     }
 
     @Override

@@ -1,5 +1,6 @@
 package processor;
 
+import client.Client;
 import client.CommandManager;
 import data.Data;
 import data.Coordinates;
@@ -134,18 +135,18 @@ public class FileProcessor extends Processor {
         } catch (NullTicketArgument | ArrayIndexOutOfBoundsException e) {
             //nullTicketArgument.printStackTrace();
             lineNum -= skip;
-            return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+            return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event, Client.getLogin());
         } catch (InvalidArgument e) {
             return null;
         } catch (NumberFormatException e) {
             if (mayNull) {
                 lineNum -= skip;
-                return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+                return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event, Client.getLogin());
             } else {
                 return null;
             }
         }
-        return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event);
+        return new Ticket(0, ticketName, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, ticketType, event, Client.getLogin());
     }
 
     @Override

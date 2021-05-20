@@ -2,6 +2,7 @@ package client;
 
 import client.gui.controllers.StartWindowController;
 import data.Data;
+import data.Ticket;
 import exceptions.CommandNotFoundException;
 import exceptions.RecursiveScript;
 import javafx.application.Application;
@@ -27,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Client extends Application {
@@ -34,6 +36,7 @@ public class Client extends Application {
     private static boolean authorization = false;
     private static String login;
     private static String password = "";
+    private static ArrayList<Ticket> tickets;
 
     public static String getLogin() {
         return login;
@@ -99,7 +102,6 @@ public class Client extends Application {
         stage.show();
     }
 
-
     public static Stage changeWindow(String window, Stage startStage, double minHeight, double minWidth) {
         try {
             FXMLLoader root = new FXMLLoader();
@@ -134,7 +136,7 @@ public class Client extends Application {
         }
     }
 
-    public static String sendCommand(Data data) throws IOException {
+    public static <T> T sendCommand(Data data) throws IOException {
         socket = SocketChannel.open();
         socket.connect(new InetSocketAddress("localhost", 13345));
         ByteBuffer buffer = ByteBuffer.allocate(65536);
@@ -199,14 +201,15 @@ public class Client extends Application {
         return null;
     }
 
-    private static String deserialize(byte[] buffer) throws ClassCastException {
+    private static<T> T deserialize(byte[] buffer) throws ClassCastException {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(buffer);
              ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream)) {
-            return (String) objectInputStream.readObject();
+            return (T) objectInputStream.readObject();
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             System.out.println("Deserialize error");
         }
-        return "POISON PILL";
+        return (T)"POISON PILL";
     }
 
 }

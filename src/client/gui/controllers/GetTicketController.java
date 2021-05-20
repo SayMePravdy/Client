@@ -24,13 +24,25 @@ import static data.Resources.*;
 
 public class GetTicketController {
 
-    private ObservableList<String> ticketTypes = FXCollections.observableArrayList("VIP", "USUAL", "CHEAP", "BUDGETARY");
+    private ObservableList<String> ticketTypes = FXCollections.observableArrayList("VIP", "USUAL", "CHEAP", "BUDGETARY", "-");
     private static Stage startStage;
+
+    public static void setPrevWindow(String prevWindow) {
+        GetTicketController.prevWindow = prevWindow;
+    }
+
+    private static String prevWindow;
     private static String commandName;
     private static List<Object> args = new ArrayList<>();
 
     public static void setStage(Stage startStage) {
         GetTicketController.startStage = startStage;
+    }
+
+    private static Ticket ticket;
+
+    public static void setTicket(Ticket ticket) {
+        GetTicketController.ticket = ticket;
     }
 
     @FXML
@@ -180,11 +192,39 @@ public class GetTicketController {
     @FXML
     void initialize() {
         ticketType.setItems(ticketTypes);
+        if (ticket != null) {
+            name.setText(ticket.getName());
+            x.setText(String.valueOf(ticket.getX()));
+            y.setText(String.valueOf(ticket.getY()));
+            price.setText(String.valueOf(ticket.getPrice()));
+            discount.setText(String.valueOf(ticket.getDiscount()));
+            comment.setText(String.valueOf(ticket.getComment()));
+            if (ticket.getType() != null) {
+                ticketType.setValue(String.valueOf(ticket.getType()));
+            }
+            if (ticket.getEvent() != null) {
+                hasEvent.setSelected(true);
+                eventName.setText(ticket.getEventName());
+                ticketsCount.setText(String.valueOf(ticket.getTicketsCount()));
+                minAge.setText(String.valueOf(ticket.getMinAge()));
+            }
+        }
     }
 
     @FXML
     public void back(ActionEvent event) {
-        CommandsWindowController.setStartStage(Client.changeWindow("/client/gui/scenes/commands.fxml", startStage, 400, 530));
+        args.clear();
+        if (prevWindow.contains("command")) {
+            CommandsWindowController.setStartStage(Client.changeWindow(prevWindow, startStage, 400, 530));
+        } else {
+            try {
+                VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+                VisualizeController.setStartStage(Client.changeWindow(prevWindow, startStage, 800, 800));
+            } catch (IOException e) {
+                //e.printStackTrace();
+                Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+            }
+        }
     }
 
     @FXML
@@ -274,20 +314,31 @@ public class GetTicketController {
             ticketEvent = new Event(1, eventName, minAge, ticketsCount);
         }
 
+        Data data;
         if (errors.length() == 0) {
-            args.add(new Ticket(1, name, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, type, ticketEvent));
-            Data data = new Data(commandName, args, Client.getLogin(), Client.getPassword());
-            System.out.println(data);
-            try {
-                String ans = Client.sendCommand(data);
-                CommandsWindowController.setStartStage(Client.changeWindow("/client/gui/scenes/commands.fxml", startStage, 450, 530));
-                Client.showWindow(200, 400, ans, Color.GREEN);
-            } catch (IOException e) {
-                Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
-            }
+            args.add(new Ticket(1, name, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, type, ticketEvent, Client.getLogin()));
+            data = new Data(commandName, args, Client.getLogin(), Client.getPassword());
         } else {
-            Client.showWindow(400, 500, errors.toString(), Color.RED);
+            if (this.name.getText().equals("") && this.x.getText().equals("") && this.y.getText().equals("") && this.price.getText().equals("") && this.discount.getText().equals("") && this.comment.getText().equals("") && (this.ticketType.getValue() == null || this.ticketType.getValue().equals("-")) && !hasEvent.isSelected()) {
+                data = new Data("remove_by_id", args, Client.getLogin(), Client.getPassword());
+            } else {
+             Client.showWindow(400, 600, errors.toString(), Color.RED);
+             return;
+            }
         }
-        args.clear();
+        try {
+            String ans = Client.sendCommand(data);
+            args.clear();
+            if (prevWindow.contains("command")) {
+                CommandsWindowController.setStartStage(Client.changeWindow(prevWindow, startStage, 450, 530));
+            } else {
+                VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+                VisualizeController.setStartStage(Client.changeWindow(prevWindow, startStage, 800, 800));
+            }
+            Client.showWindow(200, 400, ans, Color.GREEN);
+        } catch (IOException e) {
+            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+        }
+
     }
 }

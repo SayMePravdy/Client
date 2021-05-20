@@ -59,16 +59,22 @@ public class RegisterWindowController {
         args.add(Client.getPassword());
         Data data = new Data("register", args, Client.getLogin(), Client.getPassword());
 
-        try {
-            String ans = Client.sendCommand(data);
-            if (ans.equals("User sign up")) {
-                CommandsWindowController.setStartStage(Client.changeWindow("/client/gui/scenes/commands.fxml", startStage, 400, 530));
-            }else {
-                Client.showWindow(200, 400, ans, Color.RED);
+        if (Client.getLogin().equals("")) {
+            Client.showWindow(200, 400, "Login can't be empty", Color.RED);
+        } else {
+            try {
+                String ans = Client.sendCommand(data);
+                if (ans.equals("User sign up")) {
+                    CommandsWindowController.setStartStage(Client.changeWindow("/client/gui/scenes/commands.fxml", startStage, 400, 530));
+                }else {
+                    Client.showWindow(200, 400, ans, Color.RED);
+                }
+            }catch (IOException e) {
+                Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
             }
-        }catch (IOException e) {
-            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
         }
+
+
     }
 
     @FXML

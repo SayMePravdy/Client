@@ -20,9 +20,6 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import processor.FileProcessor;
 
-import static data.Resources.HELP;
-
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +28,7 @@ import java.util.TreeSet;
 public class CommandsWindowController {
 
     public Button scriptButton;
-    ObservableList<String> languages = FXCollections.observableArrayList("Русский", "Український", "português", "Español");
+    ObservableList<String> languages = FXCollections.observableArrayList("Русский", "Український", "English", "Español");
     private static Stage startStage;
 
     private Stage getStage;
@@ -109,19 +106,25 @@ public class CommandsWindowController {
 
     @FXML
     void add(ActionEvent event) {
+        GetTicketController.setTicket(null);
         GetTicketController.setCommandName("add");
+        GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
     }
 
     @FXML
     void addIfMin(ActionEvent event) {
+        GetTicketController.setTicket(null);
         GetTicketController.setCommandName("add_if_min");
+        GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
     }
 
     @FXML
     void addIfMax(ActionEvent event) {
+        GetTicketController.setTicket(null);
         GetTicketController.setCommandName("add_if_max");
+        GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
     }
 
@@ -229,6 +232,7 @@ public class CommandsWindowController {
                     Client.showWindow(150, 200, "Incorrect id", Color.RED);
                 } else {
                     GetTicketController.setCommandName("update");
+                    GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
                     GetTicketController.addArg(id);
                     GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
                 }
@@ -290,7 +294,9 @@ public class CommandsWindowController {
 
     @FXML
     void removeGreater(ActionEvent event) {
+        GetTicketController.setTicket(null);
         GetTicketController.setCommandName("remove_greater");
+        GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
     }
 
@@ -316,12 +322,23 @@ public class CommandsWindowController {
 
     @FXML
     public void visualize(ActionEvent event) {
-
+        try {
+            VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+            VisualizeController.setStartStage(Client.changeWindow("/client/gui/scenes/visualize.fxml", startStage, 800, 800));
+        } catch (IOException e) {
+            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+        }
     }
 
     @FXML
-    public void openTable(ActionEvent event) {
-        TableController.setStage(Client.changeWindow("/client/gui/scenes/table.fxml", startStage, 300, 600));
+    public void openTable(ActionEvent event)  {
+        try {
+            TableController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+            TableController.setStage(Client.changeWindow("/client/gui/scenes/table.fxml", startStage, 500, 1000));
+            //System.out.println(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())).toString());
+        } catch (IOException e) {
+            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+        }
     }
 
     public void executeScript(ActionEvent event) {

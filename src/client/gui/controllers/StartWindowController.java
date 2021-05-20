@@ -17,7 +17,7 @@ import java.util.Observable;
 
 public class StartWindowController {
 
-    ObservableList<String> languages = FXCollections.observableArrayList("Русский", "Український", "português", "Español");
+    ObservableList<String> languages = FXCollections.observableArrayList("Русский", "Український", "English", "Español");
     private static Stage startStage;
 
     public static void setStage(Stage stage) {
