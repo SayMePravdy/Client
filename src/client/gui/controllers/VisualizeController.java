@@ -142,12 +142,24 @@ public class VisualizeController {
             rectangle.setOnMouseClicked(new EventHandler<MouseEvent>() {
                 @Override
                 public void handle(MouseEvent event) {
-                    GetTicketController.setCommandName("update");
-                    GetTicketController.setBundle(bundle);
-                    GetTicketController.setPrevWindow("/client/gui/scenes/visualize.fxml");
-                    GetTicketController.addArg(viewTickets.get(finalI).getTicket().getId());
-                    GetTicketController.setTicket(viewTickets.get(finalI).getTicket());
-                    GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+                    List<Object> arg = new ArrayList<>();
+                    arg.add(viewTickets.get(finalI).getTicket().getId());
+                    try {
+                        String ans = Client.sendCommand(new Data("findId", arg, Client.getLogin(), Client.getPassword()));
+                        if (ans.equals("true")) {
+                            GetTicketController.setCommandName("update");
+                            GetTicketController.setBundle(bundle);
+                            GetTicketController.setPrevWindow("/client/gui/scenes/visualize.fxml");
+                            GetTicketController.addArg(viewTickets.get(finalI).getTicket().getId());
+                            GetTicketController.setTicket(viewTickets.get(finalI).getTicket());
+                            GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 500));
+                        } else {
+                            Client.showWindow(200, 500, bundle.getString(ans), Color.BLACK);
+                        }
+                    } catch (IOException e) {
+                        //e.printStackTrace();
+                        Client.showWindow(200, 500, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
+                    }
                 }
             });
             ScaleTransition scaleTransition = new ScaleTransition(Duration.millis(1000));

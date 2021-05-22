@@ -67,7 +67,7 @@ public class LogInWindowController {
                     Client.showWindow(200, 400, bundle.getString(ans), Color.RED);
                 }
         }catch (IOException e) {
-            Client.showWindow(200, 400, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
+            Client.showWindow(200, 500, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
         }
 
     }

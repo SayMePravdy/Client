@@ -9,11 +9,15 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -95,8 +99,20 @@ public class Client extends Application {
         label.setTextFill(color);
         label.setFont(new Font(20));
         BorderPane pane = new BorderPane(label);
+        Button ok = new Button();
+        ok.setText("Ok");
+        pane.setBottom(ok);
+        BorderPane.setMargin(ok, new Insets(20));
+        ok.setPrefSize(100, 20);
+        BorderPane.setAlignment(ok, Pos.CENTER);
         Scene scene = new Scene(pane);
         Stage stage = new Stage();
+        ok.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                stage.close();
+            }
+        });
         stage.setScene(scene);
         stage.setMinWidth(width);
         stage.setMinHeight(height);

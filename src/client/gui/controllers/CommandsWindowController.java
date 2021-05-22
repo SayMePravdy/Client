@@ -111,7 +111,7 @@ public class CommandsWindowController {
             @Override
             public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
                 //System.out.println(newValue);
-                switch ((int)newValue) {
+                switch ((int) newValue) {
                     case 0:
                         bundle = bundleRu;
                         break;
@@ -160,7 +160,7 @@ public class CommandsWindowController {
         GetTicketController.setBundle(bundle);
         GetTicketController.setCommandName("add");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
-        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 500));
     }
 
     @FXML
@@ -169,7 +169,7 @@ public class CommandsWindowController {
         GetTicketController.setBundle(bundle);
         GetTicketController.setCommandName("add_if_min");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
-        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 500));
     }
 
     @FXML
@@ -178,7 +178,7 @@ public class CommandsWindowController {
         GetTicketController.setTicket(null);
         GetTicketController.setCommandName("add_if_max");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
-        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 500));
     }
 
     private void send(Data data, double height, double width) {
@@ -279,11 +279,22 @@ public class CommandsWindowController {
                 if (id == -1) {
                     Client.showWindow(150, 200, bundle.getString("Incorrect id"), Color.RED);
                 } else {
-                    GetTicketController.setBundle(bundle);
-                    GetTicketController.setCommandName("update");
-                    GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
-                    GetTicketController.addArg(id);
-                    GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+                    List<Object> arg = new ArrayList<>();
+                    arg.add(id);
+                    try {
+                        String ans = Client.sendCommand(new Data("findId", arg, Client.getLogin(), Client.getPassword()));
+                        if (ans.equals("true")) {
+                            GetTicketController.setBundle(bundle);
+                            GetTicketController.setCommandName("update");
+                            GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
+                            GetTicketController.addArg(id);
+                            GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+                        } else {
+                            Client.showWindow(200, 500, bundle.getString(ans), Color.BLACK);
+                        }
+                    } catch (IOException e) {
+                        Client.showWindow(200, 500, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
+                    }
                 }
                 getStage.close();
             }
@@ -327,18 +338,8 @@ public class CommandsWindowController {
     }
 
     @FXML
-    void help(ActionEvent event) {
-        send(new Data("help", null, Client.getLogin(), Client.getPassword()), 400, 850);
-    }
-
-    @FXML
-    void show(ActionEvent event) {
-        send(new Data("show", null, Client.getLogin(), Client.getPassword()), 400, 970);
-    }
-
-    @FXML
     void removeById(ActionEvent event) {
-        getWindow("id", "remove_by_id");
+        getWindow("  id", "remove_by_id");
     }
 
     @FXML
@@ -347,17 +348,17 @@ public class CommandsWindowController {
         GetTicketController.setBundle(bundle);
         GetTicketController.setCommandName("remove_greater");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
-        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+        GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 500));
     }
 
     @FXML
     void update(ActionEvent event) {
-        getUpdateWindow("id");
+        getUpdateWindow("  id");
     }
 
     @FXML
     void sumOfDiscount(ActionEvent event) {
-        send(new Data("sum_of_discount", null, Client.getLogin(), Client.getPassword()), 100, 200);
+        send(new Data("sum_of_discount", null, Client.getLogin(), Client.getPassword()), 150, 150);
     }
 
     @FXML
@@ -383,7 +384,7 @@ public class CommandsWindowController {
     }
 
     @FXML
-    public void openTable(ActionEvent event)  {
+    public void openTable(ActionEvent event) {
         try {
             TableController.setBundle(bundle);
             TableController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));

@@ -378,7 +378,7 @@ public class GetTicketController {
                 VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
                 VisualizeController.setStartStage(Client.changeWindow(prevWindow, startStage, 800, 800));
             }
-            Client.showWindow(200, 500, bundle.getString(ans), Color.GREEN);
+            Client.showWindow(200, 500, bundle.getString(ans), Color.BLACK);
         } catch (IOException e) {
             Client.showWindow(200, 500, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
         }

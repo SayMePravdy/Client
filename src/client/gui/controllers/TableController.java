@@ -1,6 +1,7 @@
 package client.gui.controllers;
 
 import client.Client;
+import data.Data;
 import data.Ticket;
 import data.TicketType;
 import javafx.collections.FXCollections;
@@ -12,11 +13,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class TableController {
@@ -240,12 +239,23 @@ public class TableController {
     public void update(ActionEvent event) {
         ObservableList<Ticket> selectedItems = table.getSelectionModel().getSelectedItems();
         for (Ticket ticket: selectedItems) {
-            GetTicketController.setCommandName("update");
-            GetTicketController.setBundle(bundle);
-            GetTicketController.setPrevWindow("/client/gui/scenes/table.fxml");
-            GetTicketController.addArg(ticket.getId());
-            GetTicketController.setTicket(ticket);
-            GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+            List<Object> arg = new ArrayList<>();
+            arg.add(ticket.getId());
+            try {
+                String ans = Client.sendCommand(new Data("findId", arg, Client.getLogin(), Client.getPassword()));
+                if (ans.equals("true")) {
+                    GetTicketController.setCommandName("update");
+                    GetTicketController.setBundle(bundle);
+                    GetTicketController.setPrevWindow("/client/gui/scenes/table.fxml");
+                    GetTicketController.addArg(ticket.getId());
+                    GetTicketController.setTicket(ticket);
+                    GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 500));
+                } else {
+                    Client.showWindow(200, 500, bundle.getString(ans), Color.BLACK);
+                }
+            } catch (IOException e) {
+                Client.showWindow(200, 500, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
+            }
         }
     }
 }
