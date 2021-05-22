@@ -16,12 +16,22 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class TableController {
 
     private static Stage startStage;
     private static List<Ticket> tickets;
+    public Button updateButton;
+    public Button showButton;
+
+    public static void setBundle(ResourceBundle bundle) {
+        TableController.bundle = bundle;
+    }
+
+    //private int langNum;
+    private static ResourceBundle bundle;
 
     @FXML
     private TableColumn<Ticket, Integer> ticketsCountColumn;
@@ -69,7 +79,7 @@ public class TableController {
         TableController.tickets = tickets;
     }
 
-    ObservableList<String> fields = FXCollections.observableArrayList("id", "Ticket Name", "X", "Y", "Creation Date", "Price", "Discount", "Comment");
+    ObservableList<String> fields = FXCollections.observableArrayList("id", bundle.getString("name"), "X", "Y", bundle.getString("price"), bundle.getString("discount"), bundle.getString("comment"));
 
     @FXML
     private Button backButton;
@@ -96,34 +106,40 @@ public class TableController {
         ObservableList<Ticket> tableTickets = FXCollections.observableArrayList();
         //removeAllRows();
         if (field.getValue() == null) {
-            Client.showWindow(200, 300, "Please select field", Color.BLACK);
+            Client.showWindow(200, 300, bundle.getString("Please select field"), Color.BLACK);
         } else {
             table.getItems().removeAll(tickets);
-            switch (field.getValue()) {
-                case "id":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Integer) t.getId()))).collect(Collectors.toList()));
-                    break;
-                case "Ticket Name":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((String) t.getName()))).collect(Collectors.toList()));
-                    break;
-                case "X":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Double) t.getX()))).collect(Collectors.toList()));
-                    break;
-                case "Y":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Float) t.getY()))).collect(Collectors.toList()));
-                    break;
-                case "Creation  Date":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((ZonedDateTime) t.getCreationDate()))).collect(Collectors.toList()));
-                    break;
-                case "Price":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Float) t.getPrice()))).collect(Collectors.toList()));
-                    break;
-                case "Discount":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Long) t.getDiscount()))).collect(Collectors.toList()));
-                    break;
-                case "Comment":
-                    tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((String) t.getComment()))).collect(Collectors.toList()));
-                    break;
+            String name = bundle.getString("name");
+            String price = bundle.getString("price");
+            String discount = bundle.getString("discount");
+            String comment = bundle.getString("comment");
+            String fField = field.getValue();
+            if (fField.equals("id")) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Integer) t.getId()))).collect(Collectors.toList()));
+            }
+
+            if (fField.equals("X")) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(Ticket::getX)).collect(Collectors.toList()));
+            }
+
+            if (fField.equals("Y")) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Float) t.getY()))).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(name)) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((String) t.getName()))).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(price)) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Float) t.getPrice()))).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(discount)) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((Long) t.getDiscount()))).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(comment)) {
+                tableTickets.addAll(tickets.stream().sorted(Comparator.comparing(t -> ((String) t.getComment()))).collect(Collectors.toList()));
             }
             table.setItems(tableTickets);
         }
@@ -142,37 +158,41 @@ public class TableController {
         ObservableList<Ticket> tableTickets = FXCollections.observableArrayList();
         //removeAllRows();
         if (fField == null) {
-            Client.showWindow(200, 300, "Please select field", Color.BLACK);
+            Client.showWindow(200, 300, bundle.getString("Please select field"), Color.BLACK);
         } else {
             table.getItems().removeAll(tickets);
-            switch (fField) {
-                case "id":
-                    tableTickets.addAll(tickets.stream()
-                            .filter(ticket -> String.valueOf(ticket.getId()).contains(find))
-                            .collect(Collectors.toList()));
-                    break;
-                case "Ticket Name":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getName()).contains(find)).collect(Collectors.toList()));
-                    break;
-                case "X":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getX()).contains(find)).collect(Collectors.toList()));
-                    break;
-                case "Y":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getY()).contains(find)).collect(Collectors.toList()));
-                    break;
-                case "Creation  Date":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getCreationDate()).contains(find)).collect(Collectors.toList()));
-                    break;
-                case "Price":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getPrice()).contains(find)).collect(Collectors.toList()));
-                    break;
-                case "Discount":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getDiscount()).contains(find)).collect(Collectors.toList()));
-                    break;
-                case "Comment":
-                    tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getComment()).contains(find)).collect(Collectors.toList()));
-                    break;
+            String name = bundle.getString("name");
+            String price = bundle.getString("price");
+            String discount = bundle.getString("discount");
+            String comment = bundle.getString("comment");
+            if (fField.equals("id")) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getId()).contains(find)).collect(Collectors.toList()));
             }
+
+            if (fField.equals("X")) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getX()).contains(find)).collect(Collectors.toList()));
+            }
+
+            if (fField.equals("Y")) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getY()).contains(find)).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(name)) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getName()).contains(find)).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(price)) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getPrice()).contains(find)).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(discount)) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getDiscount()).contains(find)).collect(Collectors.toList()));
+            }
+
+            if (fField.equals(comment)) {
+                tableTickets.addAll(tickets.stream().filter(ticket -> String.valueOf(ticket.getComment()).contains(find)).collect(Collectors.toList()));
+            }
+
             table.setItems(tableTickets);
         }
     }
@@ -187,6 +207,11 @@ public class TableController {
         field.setItems(fields);
         initializeTable();
         loadTickets();
+        sortButton.setText(bundle.getString("sort"));
+        updateButton.setText(bundle.getString("updateTheCell"));
+        showButton.setText(bundle.getString("showAllTickets"));
+        filterButton.setText(bundle.getString("filter"));
+        backButton.setText(bundle.getString("back"));
     }
 
     @FXML
@@ -198,23 +223,30 @@ public class TableController {
 
     private void initializeTable() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        ticketNameColumn.setCellValueFactory(new PropertyValueFactory<>("Name"));
+        ticketNameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         xColumn.setCellValueFactory(new PropertyValueFactory<>("X"));
         yColumn.setCellValueFactory(new PropertyValueFactory<>("Y"));
-        dateColumn.setCellValueFactory(new PropertyValueFactory<>("CreationDate"));
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("Price"));
         discountColumn.setCellValueFactory(new PropertyValueFactory<>("Discount"));
         commentColumn.setCellValueFactory(new PropertyValueFactory<>("Comment"));
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("Type"));
-        eventIdColumn.setCellValueFactory(new PropertyValueFactory<>("EventId"));
-        eventNameColumn.setCellValueFactory(new PropertyValueFactory<>("EventName"));
-        ticketsCountColumn.setCellValueFactory(new PropertyValueFactory<>("TicketsCount"));
-        minimalAgeColumn.setCellValueFactory(new PropertyValueFactory<>("MinAge"));
+        eventIdColumn.setCellValueFactory(new PropertyValueFactory<>("eventId"));
+        eventNameColumn.setCellValueFactory(new PropertyValueFactory<>("eventName"));
+        ticketsCountColumn.setCellValueFactory(new PropertyValueFactory<>("ticketCount"));
+        minimalAgeColumn.setCellValueFactory(new PropertyValueFactory<>("minAge"));
         //removeAllRows();
     }
 
     public void update(ActionEvent event) {
-
+        ObservableList<Ticket> selectedItems = table.getSelectionModel().getSelectedItems();
+        for (Ticket ticket: selectedItems) {
+            GetTicketController.setCommandName("update");
+            GetTicketController.setBundle(bundle);
+            GetTicketController.setPrevWindow("/client/gui/scenes/table.fxml");
+            GetTicketController.addArg(ticket.getId());
+            GetTicketController.setTicket(ticket);
+            GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
+        }
     }
 }
 

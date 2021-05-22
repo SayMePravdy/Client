@@ -11,7 +11,7 @@
    <center>
       <VBox alignment="CENTER" minHeight="343.0" minWidth="0.0" prefHeight="343.0" prefWidth="584.0" spacing="18.0" BorderPane.alignment="CENTER">
          <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="42.0" prefWidth="108.0" text="Билеты" VBox.vgrow="ALWAYS">
+            <Label fx:id="ticketLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="39.0" prefWidth="131.0" text="Билеты" VBox.vgrow="ALWAYS">
                <font>
                   <Font name="System Bold" size="27.0" />
                </font>
@@ -21,7 +21,7 @@
                   <Image url="@попугГиф.gif" />
                </image>
             </ImageView>
-            <Button fx:id="authorizationButton" mnemonicParsing="false" onAction="#authorization" prefHeight="31.0" prefWidth="108.0" text="Войти" VBox.vgrow="ALWAYS" />
+            <Button fx:id="authorizationButton" mnemonicParsing="false" onAction="#authorization" prefHeight="31.0" prefWidth="114.0" text="Войти" VBox.vgrow="ALWAYS" />
             <Button fx:id="registerButton" layoutX="260.0" layoutY="116.0" mnemonicParsing="false" onAction="#register" prefHeight="31.0" prefWidth="109.0" text="Регистрация" VBox.vgrow="ALWAYS" />
             <Button fx:id="exitButton" layoutX="260.0" layoutY="131.0" mnemonicParsing="false" onAction="#exit" prefHeight="31.0" prefWidth="108.0" text="Выход" VBox.vgrow="ALWAYS" />
          </children>

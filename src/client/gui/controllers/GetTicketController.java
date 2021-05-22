@@ -9,9 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
@@ -19,13 +17,33 @@ import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static data.Resources.*;
 
 public class GetTicketController {
 
+    public Label commentLabel;
+    public Label discountLabel;
+    public Label priceLabel;
+    public Label typeLabel;
+    public Label eventLabel;
+    public Label eventNameLabel;
+    public Label minAgeLabel;
+    public Label ticketCountsLabel;
+    public Button enter;
+    public Button back;
+    public Label nameLabel;
+    public Label coordLabel;
     private ObservableList<String> ticketTypes = FXCollections.observableArrayList("VIP", "USUAL", "CHEAP", "BUDGETARY", "-");
     private static Stage startStage;
+
+    public static void setBundle(ResourceBundle bundle) {
+        GetTicketController.bundle = bundle;
+    }
+
+    //private int langNum;
+    private static ResourceBundle bundle;
 
     public static void setPrevWindow(String prevWindow) {
         GetTicketController.prevWindow = prevWindow;
@@ -103,7 +121,7 @@ public class GetTicketController {
     }
 
     void checkName(String data) throws NullTicketArgument {
-        if (data.isEmpty()){
+        if (data.isEmpty()) {
             throw new NullTicketArgument("Incorrect name");
         }
     }
@@ -126,7 +144,7 @@ public class GetTicketController {
 
     long checkDiscount(String data) throws InvalidArgument, NumberFormatException {
         long discount = Long.parseLong(data);
-        if (discount <= MIN || discount > MAX_DISCOUNT) {
+        if (discount < MIN || discount > MAX_DISCOUNT) {
             throw new InvalidArgument(String.format("Discount can be from %d to %d", MIN, MAX_DISCOUNT));
         }
         return discount;
@@ -153,7 +171,7 @@ public class GetTicketController {
         return ticketName;
     }
 
-    double getX(ActionEvent event) throws NumberFormatException{
+    double getX(ActionEvent event) throws NumberFormatException {
         return Double.parseDouble(x.getText());
     }
 
@@ -181,7 +199,7 @@ public class GetTicketController {
         return name;
     }
 
-    int getMinAge(ActionEvent event) throws NumberFormatException{
+    int getMinAge(ActionEvent event) throws NumberFormatException {
         return Integer.parseInt(minAge.getText());
     }
 
@@ -192,6 +210,7 @@ public class GetTicketController {
     @FXML
     void initialize() {
         ticketType.setItems(ticketTypes);
+        setLanguage();
         if (ticket != null) {
             name.setText(ticket.getName());
             x.setText(String.valueOf(ticket.getX()));
@@ -205,10 +224,26 @@ public class GetTicketController {
             if (ticket.getEvent() != null) {
                 hasEvent.setSelected(true);
                 eventName.setText(ticket.getEventName());
-                ticketsCount.setText(String.valueOf(ticket.getTicketsCount()));
+                ticketsCount.setText(String.valueOf(ticket.getTicketCount()));
                 minAge.setText(String.valueOf(ticket.getMinAge()));
             }
         }
+    }
+
+    private void setLanguage() {
+        nameLabel.setText(bundle.getString("name"));
+        coordLabel.setText(bundle.getString("coordinates"));
+        priceLabel.setText(bundle.getString("price"));
+        discountLabel.setText(bundle.getString("discount"));
+        commentLabel.setText(bundle.getString("comment"));
+        typeLabel.setText(bundle.getString("type"));
+        eventLabel.setText(bundle.getString("event"));
+        eventNameLabel.setText(bundle.getString("name"));
+        minAgeLabel.setText(bundle.getString("minAge"));
+        ticketCountsLabel.setText(bundle.getString("ticketCount"));
+        back.setText(bundle.getString("back"));
+        enter.setText(bundle.getString("enter"));
+
     }
 
     @FXML
@@ -218,11 +253,16 @@ public class GetTicketController {
             CommandsWindowController.setStartStage(Client.changeWindow(prevWindow, startStage, 400, 530));
         } else {
             try {
-                VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
-                VisualizeController.setStartStage(Client.changeWindow(prevWindow, startStage, 800, 800));
+                if (prevWindow.contains("table")) {
+                    TableController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+                    TableController.setStage(Client.changeWindow(prevWindow, startStage, 500, 1000));
+                } else {
+                    VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+                    VisualizeController.setStartStage(Client.changeWindow(prevWindow, startStage, 800, 800));
+                }
             } catch (IOException e) {
                 //e.printStackTrace();
-                Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+                Client.showWindow(200, 400, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
             }
         }
     }
@@ -246,43 +286,43 @@ public class GetTicketController {
         try {
             name = getName(event);
         } catch (NullTicketArgument e) {
-            errors.append("Name: " + e.getMessage() + "\n");
+            errors.append(bundle.getString("Name: " + e.getMessage()) + "\n");
         }
 
         try {
             x = getX(event);
         } catch (NumberFormatException e) {
-            errors.append("X: Please enter a double argument\n");
+            errors.append(bundle.getString("X: Please enter a double argument") + "\n");
         }
 
         try {
             y = getY(event);
         } catch (InvalidArgument e) {
-            errors.append("Y: " + e.getMessage() + "\n");
+            errors.append(bundle.getString("Y: " + e.getMessage()) + "\n");
         } catch (NumberFormatException e) {
-            errors.append("Y: Please enter a float argument\n");
+            errors.append(bundle.getString("Y: Please enter a float argument") + "\n");
         }
 
         try {
             price = getPrice(event);
         } catch (InvalidArgument e) {
-            errors.append("Price: " + e.getMessage() + "\n");
+            errors.append(bundle.getString("Price: " + e.getMessage()) + "\n");
         } catch (NumberFormatException e) {
-            errors.append("Price: Please enter a float argument\n");
+            errors.append(bundle.getString("Price: Please enter a float argument") + "\n");
         }
 
         try {
             discount = getDiscount(event);
         } catch (InvalidArgument e) {
-            errors.append("Discount: " + e.getMessage() + "\n");
+            errors.append(bundle.getString("Discount: " + e.getMessage()) + "\n");
         } catch (NumberFormatException e) {
-            errors.append("Discount: Please enter a long argument\n");
+            errors.append(bundle.getString("Discount: Please enter a long argument") + "\n");
         }
 
         try {
             comment = getComment(event);
         } catch (InvalidArgument e) {
-            errors.append("Comment: " + e.getMessage() + "\n");
+            errors.append(bundle.getString("Comment: " + e.getMessage()) + "\n");
         }
 
         try {
@@ -294,21 +334,21 @@ public class GetTicketController {
             try {
                 eventName = getEventName(event);
             } catch (NullTicketArgument e) {
-                errors.append("Event Name: " + e.getMessage() + "\n");
+                errors.append(bundle.getString("Event Name: " + e.getMessage()) + "\n");
             }
 
             try {
                 minAge = getMinAge(event);
             } catch (NumberFormatException e) {
-                errors.append("Discount: Please enter a long argument\n");
+                errors.append(bundle.getString("Minimal Age: Please enter an integer argument") + "\n");
             }
 
             try {
                 ticketsCount = getTicketsCount(event);
             } catch (NumberFormatException e) {
-                errors.append("Tickets Count: Please enter a long argument\n");
+                errors.append(bundle.getString("Tickets Count: Please enter a long argument") + "\n");
             } catch (NullTicketArgument e) {
-                errors.append("Tickets Count: " + e.getMessage() + "\n");
+                errors.append(bundle.getString("Tickets Count: " + e.getMessage()) + "\n");
             }
 
             ticketEvent = new Event(1, eventName, minAge, ticketsCount);
@@ -319,11 +359,11 @@ public class GetTicketController {
             args.add(new Ticket(1, name, new Coordinates(x, y), ZonedDateTime.now(), price, discount, comment, type, ticketEvent, Client.getLogin()));
             data = new Data(commandName, args, Client.getLogin(), Client.getPassword());
         } else {
-            if (this.name.getText().equals("") && this.x.getText().equals("") && this.y.getText().equals("") && this.price.getText().equals("") && this.discount.getText().equals("") && this.comment.getText().equals("") && (this.ticketType.getValue() == null || this.ticketType.getValue().equals("-")) && !hasEvent.isSelected()) {
+            if (!prevWindow.contains("command") && this.name.getText().equals("") && this.x.getText().equals("") && this.y.getText().equals("") && this.price.getText().equals("") && this.discount.getText().equals("") && this.comment.getText().equals("") && (this.ticketType.getValue() == null || this.ticketType.getValue().equals("-")) && !hasEvent.isSelected()) {
                 data = new Data("remove_by_id", args, Client.getLogin(), Client.getPassword());
             } else {
-             Client.showWindow(400, 600, errors.toString(), Color.RED);
-             return;
+                Client.showWindow(400, 650, errors.toString(), Color.RED);
+                return;
             }
         }
         try {
@@ -331,13 +371,16 @@ public class GetTicketController {
             args.clear();
             if (prevWindow.contains("command")) {
                 CommandsWindowController.setStartStage(Client.changeWindow(prevWindow, startStage, 450, 530));
-            } else {
+            }  else if (prevWindow.contains("table")) {
+                TableController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
+                TableController.setStage(Client.changeWindow(prevWindow, startStage, 500, 1000));
+            }else {
                 VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
                 VisualizeController.setStartStage(Client.changeWindow(prevWindow, startStage, 800, 800));
             }
-            Client.showWindow(200, 400, ans, Color.GREEN);
+            Client.showWindow(200, 500, bundle.getString(ans), Color.GREEN);
         } catch (IOException e) {
-            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+            Client.showWindow(200, 500, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
         }
 
     }

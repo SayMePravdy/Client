@@ -36,6 +36,13 @@ public class VisualizeController {
         VisualizeController.tickets = tickets;
     }
 
+    public static void setBundle(ResourceBundle bundle) {
+        VisualizeController.bundle = bundle;
+    }
+
+    //private int langNum;
+    private static ResourceBundle bundle;
+
     public static void setStartStage(Stage startStage) {
         VisualizeController.startStage = startStage;
     }
@@ -136,6 +143,7 @@ public class VisualizeController {
                 @Override
                 public void handle(MouseEvent event) {
                     GetTicketController.setCommandName("update");
+                    GetTicketController.setBundle(bundle);
                     GetTicketController.setPrevWindow("/client/gui/scenes/visualize.fxml");
                     GetTicketController.addArg(viewTickets.get(finalI).getTicket().getId());
                     GetTicketController.setTicket(viewTickets.get(finalI).getTicket());

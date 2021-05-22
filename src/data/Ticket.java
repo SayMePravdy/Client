@@ -1,7 +1,5 @@
 package data;
 
-import client.Client;
-
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.Objects;
@@ -42,11 +40,11 @@ public class Ticket implements Comparable<Ticket>, Serializable {
         return minAge;
     }
 
-    public Integer getTicketsCount() {
+    public Integer getTicketCount() {
         if (event != null) {
             return event.getTicketsCount();
         }
-        return ticketsCount;
+        return ticketCount;
     }
 
     @Override
@@ -59,7 +57,7 @@ public class Ticket implements Comparable<Ticket>, Serializable {
 
     private String eventName; //Поле не может быть null, Строка не может быть пустой
     private Integer minAge;
-    private Integer ticketsCount;
+    private Integer ticketCount;
     private Coordinates coordinates; //Поле не может быть null
     private Event event; //Поле может быть null
 

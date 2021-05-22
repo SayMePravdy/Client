@@ -13,21 +13,21 @@
             <Insets left="50.0" />
          </BorderPane.margin>
          <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" text="Имя" />
+            <Label fx:id="nameLabel" alignment="CENTER" contentDisplay="CENTER" text="Имя" />
             <TextField fx:id="name" VBox.vgrow="ALWAYS" />
-            <Label text="Координаты" />
+            <Label fx:id="coordLabel" text="Координаты" />
             <HBox alignment="CENTER" prefHeight="32.0" prefWidth="200.0" spacing="15.0">
                <children>
                   <TextField fx:id="x" />
                   <TextField fx:id="y" />
                </children>
             </HBox>
-            <Label text="Цена" />
-            <TextField fx:id="price"  />
-            <Label text="Скидка" />
-            <TextField fx:id="discount"  />
-            <Label text="Комментраий" />
-            <TextField fx:id="comment"  />
+            <Label fx:id="priceLabel" text="Цена" />
+            <TextField fx:id="price" />
+            <Label fx:id="discountLabel" text="Скидка" />
+            <TextField fx:id="discount" />
+            <Label fx:id="commentLabel" text="Комментраий" />
+            <TextField fx:id="comment" />
          </children>
       </VBox>
    </left>
@@ -37,11 +37,11 @@
             <Insets right="50.0" />
          </BorderPane.margin>
          <children>
-            <Label text="Тип Билета" />
+            <Label fx:id="typeLabel" text="Тип Билета" />
             <ChoiceBox fx:id="ticketType" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="27.0" prefWidth="139.0" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <Label text="Событие:">
+                  <Label fx:id="eventLabel" text="Событие:">
                      <font>
                         <Font name="System Bold Italic" size="20.0" />
                      </font>
@@ -49,19 +49,19 @@
                   <CheckBox fx:id="hasEvent" mnemonicParsing="false" />
                </children>
             </HBox>
-            <Label text="Имя">
+            <Label fx:id="eventNameLabel" text="Имя">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
             </Label>
-            <TextField fx:id="eventName" >
+            <TextField fx:id="eventName">
                <VBox.margin>
                   <Insets />
                </VBox.margin>
             </TextField>
-            <Label text="Минимальный возраст" />
+            <Label fx:id="minAgeLabel" text="Минимальный возраст" />
             <TextField fx:id="minAge" />
-            <Label text="Количество билетов" />
+            <Label fx:id="ticketCountsLabel" text="Количество билетов" />
             <TextField fx:id="ticketsCount" />
          </children>
       </VBox>

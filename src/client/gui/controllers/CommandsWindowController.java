@@ -3,6 +3,8 @@ package client.gui.controllers;
 import client.Client;
 import data.Data;
 import exceptions.RecursiveScript;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -21,9 +23,10 @@ import javafx.stage.Stage;
 import processor.FileProcessor;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
+
+import static data.resources.LanguageBundles.*;
+import static data.resources.LanguageBundles.bundleEs;
 
 public class CommandsWindowController {
 
@@ -92,11 +95,58 @@ public class CommandsWindowController {
     @FXML
     private Button addIfMinButton;
 
+    public static void setBundle(ResourceBundle bundle) {
+        CommandsWindowController.bundle = bundle;
+    }
+
+    //private int langNum;
+    private static ResourceBundle bundle;
+
     @FXML
     void initialize() {
+        setLanguage();
         userNameButton.setText(Client.getLogin());
-        language.setValue("Русский");
         language.setItems(languages);
+        language.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+                //System.out.println(newValue);
+                switch ((int)newValue) {
+                    case 0:
+                        bundle = bundleRu;
+                        break;
+                    case 1:
+                        bundle = bundleUa;
+                        break;
+                    case 2:
+                        bundle = bundleEn;
+                        break;
+                    case 3:
+                        bundle = bundleEs;
+                        break;
+                }
+                setLanguage();
+            }
+        });
+    }
+
+    private void setLanguage() {
+        language.setValue(bundle.getString("language"));
+        addButton.setText(bundle.getString("add"));
+        addIfMaxButton.setText(bundle.getString("addIfMax"));
+        addIfMinButton.setText(bundle.getString("addIfMin"));
+        maxByCommentButton.setText(bundle.getString("maxByComment"));
+        printUniquePriceButton.setText(bundle.getString("printUniquePrices"));
+        tableButton.setText(bundle.getString("table"));
+        removeByIdButton.setText(bundle.getString("removeById"));
+        clearButton.setText(bundle.getString("clear"));
+        infoButton.setText(bundle.getString("info"));
+        sumOfDiscountButton.setText(bundle.getString("sumOfDiscount"));
+        removeGreaterButton.setText(bundle.getString("removeGreater"));
+        scriptButton.setText(bundle.getString("executeScript"));
+        updateButton.setText(bundle.getString("update"));
+        visualizationButton.setText(bundle.getString("visualize"));
+        exitButton.setText(bundle.getString("exit"));
     }
 
     @FXML
@@ -107,6 +157,7 @@ public class CommandsWindowController {
     @FXML
     void add(ActionEvent event) {
         GetTicketController.setTicket(null);
+        GetTicketController.setBundle(bundle);
         GetTicketController.setCommandName("add");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
@@ -115,6 +166,7 @@ public class CommandsWindowController {
     @FXML
     void addIfMin(ActionEvent event) {
         GetTicketController.setTicket(null);
+        GetTicketController.setBundle(bundle);
         GetTicketController.setCommandName("add_if_min");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
@@ -122,6 +174,7 @@ public class CommandsWindowController {
 
     @FXML
     void addIfMax(ActionEvent event) {
+        GetTicketController.setBundle(bundle);
         GetTicketController.setTicket(null);
         GetTicketController.setCommandName("add_if_max");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
@@ -130,23 +183,18 @@ public class CommandsWindowController {
 
     private void send(Data data, double height, double width) {
         try {
-            String ans = Client.sendCommand(data);
-            StringBuilder corAns = new StringBuilder();
-            int cnt = 1;
-            if (!data.getCommandName().equals("help")) {
-                while (ans.length() > 100 * cnt) {
-                    corAns.append(ans.substring((cnt - 1) * 100, cnt * 100) + "\n");
-                    cnt++;
-                }
-                if (corAns.length() > 0) {
-                    corAns.append(ans.substring(100 * (cnt - 1)));
-                    ans = corAns.toString();
-                }
+            String ans;
+            String servAns = Client.sendCommand(data);
+            try {
+                ans = bundle.getString(servAns);
+            } catch (MissingResourceException e) {
+                ans = servAns;
             }
-            CommandsWindowController.setStartStage(Client.changeWindow("/client/gui/scenes/commands.fxml", startStage, 450, 530));
+
+            //CommandsWindowController.setStartStage(Client.changeWindow("/client/gui/scenes/commands.fxml", startStage, 450, 530));
             Client.showWindow(height, width, ans, Color.BLACK);
         } catch (IOException e) {
-            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+            Client.showWindow(200, 400, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
         }
     }
 
@@ -159,7 +207,7 @@ public class CommandsWindowController {
             public void handle(ActionEvent event) {
                 int id = checkId(textField.getText());
                 if (id == -1) {
-                    Client.showWindow(150, 200, "Incorrect id", Color.RED);
+                    Client.showWindow(150, 200, bundle.getString("Incorrect id"), Color.RED);
                 } else {
                     List<Object> args = new ArrayList<>();
                     args.add(id);
@@ -196,11 +244,11 @@ public class CommandsWindowController {
                     for (Data com : coms) {
                         Client.sendCommand(com);
                     }
-                    Client.showWindow(150, 300, "Script executed", Color.GREEN);
+                    Client.showWindow(150, 300, bundle.getString("Script executed"), Color.GREEN);
                 } catch (IOException e) {
-                    Client.showWindow(150, 300, "Problems with the file which you enter", Color.RED);
+                    Client.showWindow(150, 400, bundle.getString("Problems with the file which you enter"), Color.RED);
                 } catch (RecursiveScript recursiveScript) {
-                    Client.showWindow(150, 300, "Error! Recursive in script", Color.RED);
+                    Client.showWindow(150, 300, bundle.getString("Error! Recursive in script"), Color.RED);
                 }
                 getStage.close();
             }
@@ -229,8 +277,9 @@ public class CommandsWindowController {
             public void handle(ActionEvent event) {
                 int id = checkId(textField.getText());
                 if (id == -1) {
-                    Client.showWindow(150, 200, "Incorrect id", Color.RED);
+                    Client.showWindow(150, 200, bundle.getString("Incorrect id"), Color.RED);
                 } else {
+                    GetTicketController.setBundle(bundle);
                     GetTicketController.setCommandName("update");
                     GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
                     GetTicketController.addArg(id);
@@ -295,6 +344,7 @@ public class CommandsWindowController {
     @FXML
     void removeGreater(ActionEvent event) {
         GetTicketController.setTicket(null);
+        GetTicketController.setBundle(bundle);
         GetTicketController.setCommandName("remove_greater");
         GetTicketController.setPrevWindow("/client/gui/scenes/commands.fxml");
         GetTicketController.setStage(Client.changeWindow("/client/gui/scenes/ticket.fxml", startStage, 400, 300));
@@ -317,27 +367,30 @@ public class CommandsWindowController {
 
     @FXML
     void changeUser(ActionEvent event) {
+        StartWindowController.setBundle(bundle);
         StartWindowController.setStage(Client.changeWindow("/client/gui/scenes/start.fxml", startStage, 435, 100));
     }
 
     @FXML
     public void visualize(ActionEvent event) {
         try {
+            VisualizeController.setBundle(bundle);
             VisualizeController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
             VisualizeController.setStartStage(Client.changeWindow("/client/gui/scenes/visualize.fxml", startStage, 800, 800));
         } catch (IOException e) {
-            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+            Client.showWindow(200, 400, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
         }
     }
 
     @FXML
     public void openTable(ActionEvent event)  {
         try {
+            TableController.setBundle(bundle);
             TableController.setTickets(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())));
             TableController.setStage(Client.changeWindow("/client/gui/scenes/table.fxml", startStage, 500, 1000));
             //System.out.println(Client.sendCommand(new Data("get", null, Client.getLogin(), Client.getPassword())).toString());
         } catch (IOException e) {
-            Client.showWindow(200, 400, "Server is tired. Try to reconnect later", Color.RED);
+            Client.showWindow(200, 400, bundle.getString("Server is tired. Try to reconnect later"), Color.RED);
         }
     }
 

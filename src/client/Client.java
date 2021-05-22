@@ -31,6 +31,8 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static data.resources.LanguageBundles.bundleRu;
+
 public class Client extends Application {
     private static SocketChannel socket;
     private static boolean authorization = false;
@@ -65,6 +67,7 @@ public class Client extends Application {
         stage.setMinWidth(100);
 
         FXMLLoader root = new FXMLLoader();
+        StartWindowController.setBundle(bundleRu);
         root.setLocation(getClass().getResource("/client/gui/scenes/start.fxml"));
         Parent xml = root.load();
         Scene scene = new Scene(xml);
@@ -122,6 +125,8 @@ public class Client extends Application {
     }
 
     public static void start() throws IOException {
+        socket = SocketChannel.open();
+        socket.connect(new InetSocketAddress("localhost", 13345));
         ConsoleProcessor consoleProcessor = new ConsoleProcessor();
         while (true) {
             try {
@@ -145,6 +150,7 @@ public class Client extends Application {
         socket.write(buffer);
         buffer.clear();
         socket.read(buffer);
+        socket.close();
         return deserialize(buffer.array());
     }
 
